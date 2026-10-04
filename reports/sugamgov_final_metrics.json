@@ -1,0 +1,174 @@
+{
+  "project": {
+    "title": "SugamGov AI — Intelligent Government Service Assistant Using LLMs and Real-Time Information Retrieval",
+    "short_name": "SugamGov AI / Sugamai",
+    "version": "1.0.0 (Production-Ready Architecture)",
+    "date": "October 2026",
+    "status": "Production-Ready / Engineering Complete"
+  },
+  "dataset": {
+    "source": "Aggregated National & State Government Portals (MyScheme.gov.in / Kaggle archive)",
+    "total_schemes": 3397,
+    "total_chunks": 20497,
+    "corpus_language": "English (Primary)",
+    "chunking_strategy": "Field-aware semantic chunking (scheme_name, details, eligibility, benefits, application, documents)",
+    "average_chunks_per_scheme": 6.03,
+    "nature": "Static reference snapshot (not real-time live synchronized)"
+  },
+  "database": {
+    "rdbms": "PostgreSQL 17 + pgvector extension",
+    "knowledge_tables": [
+      "schemes",
+      "scheme_chunks",
+      "sources",
+      "scheme_versions"
+    ],
+    "embedding_local": {
+      "model": "intfloat/multilingual-e5-small",
+      "dimension": 384,
+      "distance_metric": "Cosine Distance (<=>)",
+      "populated_count": 20497,
+      "null_count": 0,
+      "coverage_percentage": 100.0,
+      "index_type": "HNSW (vector_cosine_ops, m=16, ef_construction=64)",
+      "index_name": "idx_scheme_chunks_embedding_local_hnsw"
+    },
+    "embedding_legacy_gemini": {
+      "model": "models/text-embedding-004",
+      "dimension": 768,
+      "populated_count": 1260,
+      "null_count": 19237,
+      "status": "Inactive / Superseded by 100% complete local multilingual embeddings"
+    },
+    "fts_lexical": {
+      "generated_column": "search_vector (tsvector)",
+      "indexing": "GIN (Generalized Inverted Index)",
+      "index_name": "idx_scheme_chunks_search_vector",
+      "populated_count": 20497,
+      "null_count": 0
+    },
+    "nosql_store": {
+      "system": "MongoDB",
+      "database_name": "sugamgov",
+      "collections": [
+        "users",
+        "user_preferences",
+        "conversations",
+        "chat_messages"
+      ],
+      "role": "Citizen authentication, preferences, conversational persistence, multi-tenant isolation"
+    }
+  },
+  "retrieval_performance_optimization": {
+    "initial_production_baseline_ms": 2524.76,
+    "evaluation_double_counting_artifact_ms": 5880.0,
+    "bottleneck_identified": "Unindexed on-the-fly to_tsvector() computation across 20,497 rows (~1,795 ms)",
+    "optimizations_applied": [
+      "Persisted generated tsvector column + GIN index",
+      "pgvector HNSW cosine index (m=16, ef_construction=64)",
+      "Thread-safe concurrent execution of keyword and vector search branches"
+    ],
+    "component_speedups": {
+      "fts_sql_ms": {
+        "before": 1795.14,
+        "after": 1.85,
+        "speedup": "970x"
+      },
+      "vector_sql_ms": {
+        "before": 134.89,
+        "after": 7.71,
+        "speedup": "17.5x"
+      },
+      "hybrid_branch_ms": {
+        "before": 1925.14,
+        "after": 98.92,
+        "speedup": "19.5x"
+      },
+      "production_retrieval_e2e_ms": {
+        "before": 2524.76,
+        "after": 119.22,
+        "speedup": "21.2x"
+      }
+    },
+    "final_step20_retrieval_latency": {
+      "average_ms": 125.4,
+      "median_ms": 105.68,
+      "p95_ms": 243.07,
+      "min_ms": 93.14,
+      "overall_latency_reduction_pct": 95.03
+    }
+  },
+  "retrieval_accuracy_step20": {
+    "total_queries": 86,
+    "overall_production_reranked": {
+      "recall_at_5": 0.8372,
+      "recall_at_10": 0.907,
+      "mrr_at_10": 0.739,
+      "top40_candidate_hit_rate": 0.9535,
+      "rank_1_hits": "56 / 86 (65.1%)"
+    },
+    "by_language": {
+      "english": {
+        "query_count": 60,
+        "recall_at_5": 0.9333,
+        "recall_at_10": 0.9667,
+        "mrr_at_10": 0.8449,
+        "top40_hit_rate": 1.0,
+        "rank_1_hits": "46 / 60 (76.7%)"
+      },
+      "hindi": {
+        "query_count": 12,
+        "recall_at_5": 0.75,
+        "recall_at_10": 0.8333,
+        "mrr_at_10": 0.5722,
+        "top40_hit_rate": 0.9167,
+        "rank_1_hits": "5 / 12 (41.7%)"
+      },
+      "gujarati": {
+        "query_count": 14,
+        "recall_at_5": 0.5,
+        "recall_at_10": 0.7143,
+        "mrr_at_10": 0.4281,
+        "top40_hit_rate": 0.7857,
+        "rank_1_hits": "5 / 14 (35.7%)"
+      }
+    }
+  },
+  "rag_generation_and_answer_quality": {
+    "model": "gemini-3.5-flash-lite",
+    "temperature": 0.0,
+    "total_test_cases": 31,
+    "grounding_pass": 25,
+    "grounding_partial": 2,
+    "grounding_fail": 4,
+    "grounding_pass_rate_pct": 80.65,
+    "observed_hallucinations": 0,
+    "hallucination_rate_pct": 0.0,
+    "citation_precision_pct": 100.0,
+    "prompt_injection_defense": "5 / 5 PASS (100.0%)",
+    "streaming_endpoint_status": "PASS",
+    "average_e2e_response_time_ms": 2125.7,
+    "p95_e2e_response_time_ms": 3726.3
+  },
+  "multilingual_refusal_fix_step22": {
+    "root_cause": "Hardcoded English refusal phrase in Rule 3 of SYSTEM_INSTRUCTION",
+    "solution": "Localized refusal templates for HI/GU/EN, reinforced language directives, target language detection",
+    "targeted_tests": "16 / 16 PASS (100%)",
+    "prompt_injection_tests": "5 / 5 PASS (100%)",
+    "streaming_tests": "3 / 3 PASS (100%)",
+    "regression_suite": "157 / 157 PASS (100%)"
+  },
+  "production_readiness_audit_step23": {
+    "blockers": 0,
+    "high_severity_issues": 0,
+    "medium_severity_issues": 0,
+    "low_severity_issues": 1,
+    "info_findings": 2,
+    "e2e_chat_scenarios": "5 / 5 PASS",
+    "authentication_checks": "11 / 11 PASS",
+    "mongodb_isolation_checks": "4 / 4 PASS",
+    "nextjs_production_build": "PASS (Turbopack, exit code 0)",
+    "regression_suite": "157 / 157 PASS (100%)",
+    "database_unintended_writes": 0
+  }
+}

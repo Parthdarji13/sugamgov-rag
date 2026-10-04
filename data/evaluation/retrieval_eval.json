@@ -1,0 +1,782 @@
+[
+  {
+    "query_id": "Q001",
+    "query": "AICTE scholarship for specially abled degree students",
+    "relevant_scheme_ids": [
+      "S0112"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q002",
+    "query": "diploma scholarship for disabled students AICTE",
+    "relevant_scheme_ids": [
+      "S0113"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q003",
+    "query": "pre-matric scholarship for backward class students Madhya Pradesh",
+    "relevant_scheme_ids": [
+      "S0011"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Madhya Pradesh",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q004",
+    "query": "financial assistance for purchasing tractor in Gujarat",
+    "relevant_scheme_ids": [
+      "S0103"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q005",
+    "query": "funeral expense financial assistance Andhra Pradesh",
+    "relevant_scheme_ids": [
+      "S0005"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Andhra Pradesh",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q006",
+    "query": "inter-caste marriage incentive scheduled tribe Karnataka",
+    "relevant_scheme_ids": [
+      "S0006"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Karnataka",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q007",
+    "query": "women entrepreneurship loan subsidy Rajasthan",
+    "relevant_scheme_ids": [
+      "S0008"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Rajasthan",
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q008",
+    "query": "free coaching for sanitation workers children in Chhattisgarh",
+    "relevant_scheme_ids": [
+      "S0012"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Chhattisgarh",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q009",
+    "query": "Aam Aadmi Bima Yojana life insurance Maharashtra",
+    "relevant_scheme_ids": [
+      "S0134"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Maharashtra",
+      "level": "State",
+      "category": "Banking, Financial Services and Insurance"
+    }
+  },
+  {
+    "query_id": "Q010",
+    "query": "pension for unmarried women in Sikkim",
+    "relevant_scheme_ids": [
+      "S2946"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Sikkim",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q011",
+    "query": "housing subsidy scheme for construction workers in Gujarat",
+    "relevant_scheme_ids": [
+      "S1354"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Housing & Shelter"
+    }
+  },
+  {
+    "query_id": "Q012",
+    "query": "widow pension destitute women Punjab",
+    "relevant_scheme_ids": [
+      "S3348"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Punjab",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q013",
+    "query": "Sardar Patel Awas Yojana rural housing Gujarat",
+    "relevant_scheme_ids": [
+      "S2677"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Housing & Shelter"
+    }
+  },
+  {
+    "query_id": "Q014",
+    "query": "financial aid to farmers for seeds and planting material SMSP",
+    "relevant_scheme_ids": [
+      "S1681"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q015",
+    "query": "fisheries development and aquaculture PM Matsya Sampada",
+    "relevant_scheme_ids": [
+      "S2429"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q016",
+    "query": "agriculture mechanization subsidy for farm equipment",
+    "relevant_scheme_ids": [
+      "S3061"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q017",
+    "query": "SWANATH scholarship for orphaned and COVID affected students",
+    "relevant_scheme_ids": [
+      "S0126"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q018",
+    "query": "academic education financial aid Jammu and Kashmir construction workers",
+    "relevant_scheme_ids": [
+      "S0169"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Jammu and Kashmir",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q019",
+    "query": "farm mechanization scheme for scheduled caste farmers Gujarat",
+    "relevant_scheme_ids": [
+      "S0102"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q020",
+    "query": "farm mechanization subsidy for ST tribal farmers Gujarat",
+    "relevant_scheme_ids": [
+      "S0101"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q021",
+    "query": "subsidy for setting up agro service provider centers in Gujarat",
+    "relevant_scheme_ids": [
+      "S0104"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q022",
+    "query": "rent assistance for micro and small enterprises in Gujarat",
+    "relevant_scheme_ids": [
+      "S0157"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Business & Entrepreneurship"
+    }
+  },
+  {
+    "query_id": "Q023",
+    "query": "abua awas yojana housing assistance Jharkhand",
+    "relevant_scheme_ids": [
+      "S0168"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Jharkhand",
+      "level": "State",
+      "category": "Housing & Shelter"
+    }
+  },
+  {
+    "query_id": "Q024",
+    "query": "pension for war widows with no children Haryana",
+    "relevant_scheme_ids": [
+      "S0184"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Haryana",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q025",
+    "query": "agri clinics and agribusiness centers for agriculture graduates",
+    "relevant_scheme_ids": [
+      "S0201"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q026",
+    "query": "agricultural marketing infrastructure capital investment subsidy",
+    "relevant_scheme_ids": [
+      "S0204"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q027",
+    "query": "agricultural extension training for farmers and field workers",
+    "relevant_scheme_ids": [
+      "S0203"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q028",
+    "query": "export promotion assistance for agricultural and processed food products",
+    "relevant_scheme_ids": [
+      "S0207"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q029",
+    "query": "post matric scholarship for students with disabilities",
+    "relevant_scheme_ids": [
+      "S2386"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q030",
+    "query": "BPL technical education student welfare scholarship Chhattisgarh",
+    "relevant_scheme_ids": [
+      "S0356"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Chhattisgarh",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q031",
+    "query": "scheme for additional scholarship to scheduled tribe students Andaman",
+    "relevant_scheme_ids": [
+      "S2767"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Andaman and Nicobar Islands",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q032",
+    "query": "housing subsidy urban development swarnim jayanti Gujarat",
+    "relevant_scheme_ids": [
+      "S3127"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Housing & Shelter"
+    }
+  },
+  {
+    "query_id": "Q033",
+    "query": "super 30 free engineering and medical coaching Tripura",
+    "relevant_scheme_ids": [
+      "S0080"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Tripura",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q034",
+    "query": "insurance scheme for unorganized workers in Jammu and Kashmir",
+    "relevant_scheme_ids": [
+      "S0098"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Jammu and Kashmir",
+      "level": "State",
+      "category": "Banking, Financial Services and Insurance"
+    }
+  },
+  {
+    "query_id": "Q035",
+    "query": "monthly pension allowance for severe disability 60 percent Tripura",
+    "relevant_scheme_ids": [
+      "S0097"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Tripura",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q036",
+    "query": "consortia and tender marketing support for MSMEs",
+    "relevant_scheme_ids": [
+      "S0004"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Business & Entrepreneurship"
+    }
+  },
+  {
+    "query_id": "Q037",
+    "query": "advanced skill training in handicrafts and coir Puducherry",
+    "relevant_scheme_ids": [
+      "S0031"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Puducherry",
+      "level": "State",
+      "category": "Skills & Employment"
+    }
+  },
+  {
+    "query_id": "Q038",
+    "query": "financial grant for elderly master craftsmen and artisans",
+    "relevant_scheme_ids": [
+      "S0072"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Puducherry",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q039",
+    "query": "back-ended investment subsidy to paddy farmers Puducherry",
+    "relevant_scheme_ids": [
+      "S0036"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Puducherry",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q040",
+    "query": "immediate relief assistance to missing fishermen families Puducherry",
+    "relevant_scheme_ids": [
+      "S0001"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Puducherry",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q041",
+    "query": "short term training programme under SFURTI scheme AICTE",
+    "relevant_scheme_ids": [
+      "S0002"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q042",
+    "query": "ex-gratia death compensation for unorganized construction worker Madhya Pradesh",
+    "relevant_scheme_ids": [
+      "S0003"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Madhya Pradesh",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q043",
+    "query": "home loan interest subsidy scheme Aponar Apon Ghar Assam",
+    "relevant_scheme_ids": [
+      "S0245"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Assam",
+      "level": "State",
+      "category": "Banking, Financial Services and Insurance"
+    }
+  },
+  {
+    "query_id": "Q044",
+    "query": "education loan scheme Arivu for minority students Karnataka",
+    "relevant_scheme_ids": [
+      "S0247"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Karnataka",
+      "level": "State",
+      "category": "Banking, Financial Services and Insurance"
+    }
+  },
+  {
+    "query_id": "Q045",
+    "query": "nutritious food and milk for pregnant women Arogya Lakshmi Telangana",
+    "relevant_scheme_ids": [
+      "S0249"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Telangana",
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q046",
+    "query": "financial assistance for serious illness treatment Assam Arogya Nidhi",
+    "relevant_scheme_ids": [
+      "S0268"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Assam",
+      "level": "State",
+      "category": "Health & Wellness"
+    }
+  },
+  {
+    "query_id": "Q047",
+    "query": "housing scheme Akanksha for state government employees West Bengal",
+    "relevant_scheme_ids": [
+      "S0214"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "West Bengal",
+      "level": "State",
+      "category": "Housing & Shelter"
+    }
+  },
+  {
+    "query_id": "Q048",
+    "query": "financial assistance to divorced Muslim women Bihar",
+    "relevant_scheme_ids": [
+      "S0222"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Bihar",
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q049",
+    "query": "coaching assistance scheme Akanksha for tribal students MP",
+    "relevant_scheme_ids": [
+      "S0215"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Madhya Pradesh",
+      "level": "State",
+      "category": "Education & Learning"
+    }
+  },
+  {
+    "query_id": "Q050",
+    "query": "maternity assistance cash benefit for pregnant mothers Mamata Odisha",
+    "relevant_scheme_ids": [
+      "S1790"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Odisha",
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q051",
+    "query": "marriage financial assistance for registered building workers Karnataka",
+    "relevant_scheme_ids": [
+      "S1807"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Karnataka",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q052",
+    "query": "maternity financial assistance for female factory workers Haryana",
+    "relevant_scheme_ids": [
+      "S1023"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Haryana",
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q053",
+    "query": "drip and sprinkler irrigation subsidy per drop more crop",
+    "relevant_scheme_ids": [
+      "S2427"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q054",
+    "query": "coffee development group nurseries support North Eastern Region",
+    "relevant_scheme_ids": [
+      "S0603"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "Central",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q055",
+    "query": "accident benefit compensation for transport workers West Bengal",
+    "relevant_scheme_ids": [
+      "S0174"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "West Bengal",
+      "level": "State",
+      "category": "Social welfare & Empowerment"
+    }
+  },
+  {
+    "query_id": "Q056",
+    "query": "financial assistance to girl child Aapki Beti Hamari Beti Haryana",
+    "relevant_scheme_ids": [
+      "S0136"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": null,
+      "level": "State",
+      "category": "Women and Child"
+    }
+  },
+  {
+    "query_id": "Q057",
+    "query": "incentive scheme for adventure tour operators West Bengal",
+    "relevant_scheme_ids": [
+      "S0013"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "West Bengal",
+      "level": "State",
+      "category": "Business & Entrepreneurship"
+    }
+  },
+  {
+    "query_id": "Q058",
+    "query": "health insurance scheme for residents Andaman and Nicobar",
+    "relevant_scheme_ids": [
+      "S0229"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Andaman and Nicobar Islands",
+      "level": "State",
+      "category": "Health & Wellness"
+    }
+  },
+  {
+    "query_id": "Q059",
+    "query": "assistance to farmers for fish farming in farm ponds Odisha",
+    "relevant_scheme_ids": [
+      "S0066"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Odisha",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  },
+  {
+    "query_id": "Q060",
+    "query": "financial assistance for purchasing heavy farm equipment tractor Gujarat",
+    "relevant_scheme_ids": [
+      "S0303"
+    ],
+    "relevant_chunk_ids": [],
+    "metadata": {
+      "state": "Gujarat",
+      "level": "State",
+      "category": "Agriculture, Rural & Environment"
+    }
+  }
+]

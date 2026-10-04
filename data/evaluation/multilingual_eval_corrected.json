@@ -1,0 +1,276 @@
+[
+  {
+    "query_id": "HI_01",
+    "lang": "HI",
+    "query": "आयुष्मान भारत योजना के तहत मुफ्त इलाज पात्रता क्या है?",
+    "original_expected_sid": "S0354",
+    "relevant_scheme_ids": ["S0354"],
+    "intent": "eligibility/health",
+    "status": "verified_accurate",
+    "db_scheme_name": "Ayushman Bharat - Pradhan Mantri Jan Arogya Yojana"
+  },
+  {
+    "query_id": "HI_02",
+    "lang": "HI",
+    "query": "किसान क्रेडिट कार्ड कैसे बनवाएं और इसके क्या फायदे हैं?",
+    "original_expected_sid": "S1663",
+    "relevant_scheme_ids": ["S1663"],
+    "intent": "benefits/documents",
+    "status": "verified_accurate",
+    "db_scheme_name": "Kisan Credit Card"
+  },
+  {
+    "query_id": "HI_03",
+    "lang": "HI",
+    "query": "प्रधानमंत्री मातृ वंदना योजना में गर्भवती महिलाओं को कितनी राशि मिलती है?",
+    "original_expected_sid": "S2428",
+    "relevant_scheme_ids": ["S2428"],
+    "intent": "benefits/maternity",
+    "status": "verified_accurate",
+    "db_scheme_name": "Pradhan Mantri Matru Vandana Yojana"
+  },
+  {
+    "query_id": "HI_04",
+    "lang": "HI",
+    "query": "पीएम आवास योजना शहरी ऑनलाइन आवेदन प्रक्रिया और पात्रता",
+    "original_expected_sid": "S2411",
+    "relevant_scheme_ids": ["S2411"],
+    "intent": "application/housing",
+    "status": "verified_accurate",
+    "db_scheme_name": "Pradhan Mantri Awas Yojana - Urban"
+  },
+  {
+    "query_id": "HI_05",
+    "lang": "HI",
+    "query": "किसानों के लिए सोलर पंप कुसुम योजना सब्सिडी",
+    "original_expected_sid": "S2426",
+    "relevant_scheme_ids": ["S2426"],
+    "intent": "agriculture/solar",
+    "status": "verified_accurate",
+    "db_scheme_name": "Pradhan Mantri Kisan Urja Suraksha Evam Utthan Mahabhiyan Scheme For Farmers."
+  },
+  {
+    "query_id": "HI_06",
+    "lang": "HI",
+    "query": "महिला उद्यमिता स्वरोजगार ऋण योजना राजस्थान इंदिरा महिला शक्ति",
+    "original_expected_sid": "S0008",
+    "relevant_scheme_ids": ["S0008"],
+    "intent": "women/loan",
+    "status": "verified_accurate",
+    "db_scheme_name": "Indira Mahila Shakti Udyam Protsahan Yojana"
+  },
+  {
+    "query_id": "HI_07",
+    "lang": "HI",
+    "query": "मध्य प्रदेश में पिछड़े वर्ग के विद्यार्थियों के लिए प्री मैट्रिक छात्रवृत्ति",
+    "original_expected_sid": "S0011",
+    "relevant_scheme_ids": ["S0011"],
+    "intent": "education/scholarship",
+    "status": "verified_accurate",
+    "db_scheme_name": "Pre-Matric Scholarship for Backward Class Students"
+  },
+  {
+    "query_id": "HI_08",
+    "lang": "HI",
+    "query": "युवाओं के लिए राष्ट्रीय शिक्षुता संवर्धन योजना अप्रेंटिसशिप",
+    "original_expected_sid": "S2113",
+    "relevant_scheme_ids": ["S2113"],
+    "intent": "skills/employment",
+    "status": "verified_accurate",
+    "db_scheme_name": "National Apprenticeship Promotion Scheme-2"
+  },
+  {
+    "query_id": "HI_09",
+    "lang": "HI",
+    "query": "उत्तर प्रदेश गंभीर बीमारी उपचार सहायता योजना",
+    "original_expected_sid": "S1163",
+    "relevant_scheme_ids": ["S1163"],
+    "intent": "health/assistance",
+    "status": "verified_accurate",
+    "db_scheme_name": "Gambhir Bimari Sahayata Yojana"
+  },
+  {
+    "query_id": "HI_10",
+    "lang": "HI",
+    "query": "दिव्यांग छात्रों के लिए सक्षम डिग्री छात्रवृत्ति एआईसीटीई",
+    "original_expected_sid": "S2648",
+    "relevant_scheme_ids": ["S0112", "S0113"],
+    "intent": "disability/scholarship",
+    "status": "corrected",
+    "correction_reason": "Original S2648 was old-age pension in MP; S0112 is AICTE Saksham Degree scholarship",
+    "db_scheme_name": "AICTE – Saksham Scholarship Scheme For Specially-Abled Student (Degree)"
+  },
+  {
+    "query_id": "HI_11",
+    "lang": "HI",
+    "query": "बिहार मुख्यमंत्री कन्या उत्थान योजना स्नातक पास बालिका प्रोत्साहन",
+    "original_expected_sid": "S1873",
+    "relevant_scheme_ids": ["S0528"],
+    "intent": "women/education",
+    "status": "corrected",
+    "correction_reason": "Original S1873 was medical assistance in Arunachal Pradesh; S0528 is Chief Minister Kanya Utthan Yojana in Bihar",
+    "db_scheme_name": "Chief Minister Kanya Utthan Yojana"
+  },
+  {
+    "query_id": "HI_12",
+    "lang": "HI",
+    "query": "श्रमिकों के लिए प्रधानमंत्री श्रम योगी मानधन पेंशन योजना",
+    "original_expected_sid": "S2441",
+    "relevant_scheme_ids": ["S2341", "S2084"],
+    "intent": "labor/pension",
+    "status": "corrected",
+    "correction_reason": "Original S2441 was Pratibha Kiran Scholarship in MP; S2341 is unorganized worker construction pension",
+    "db_scheme_name": "Pension for the Construction Workers"
+  },
+  {
+    "query_id": "GU_01",
+    "lang": "GU",
+    "query": "મુખ્યમંત્રી અમૃતમ મા યોજના હેઠળ કેશલેસ સારવારની પાત્રતા",
+    "original_expected_sid": "S1923",
+    "relevant_scheme_ids": ["S1976"],
+    "intent": "health/cashless",
+    "status": "corrected",
+    "correction_reason": "Original S1923 was AICTE engineering modernisation; S1976 is Mukhyamantri Amrutum Yojana in Gujarat",
+    "db_scheme_name": "Mukhyamantri Amrutum Yojana"
+  },
+  {
+    "query_id": "GU_02",
+    "lang": "GU",
+    "query": "ગુજરાતમાં કુંવરબાઈનું મામેરું યોજના માટે કોણ અરજી કરી શકે?",
+    "original_expected_sid": "S1726",
+    "relevant_scheme_ids": ["S1686"],
+    "intent": "social/marriage",
+    "status": "corrected",
+    "correction_reason": "Original S1726 was Odisha fishing ban support; S1686 is Kunwar Bai Nu Mameru Yojana in Gujarat",
+    "db_scheme_name": "Kunwar Bai Nu Mameru Yojana"
+  },
+  {
+    "query_id": "GU_03",
+    "lang": "GU",
+    "query": "ગુજરાત માનવ ગરિમા યોજના હેઠળ સ્વરોજગાર માટે સાધન સહાય",
+    "original_expected_sid": "S1765",
+    "relevant_scheme_ids": ["S1793"],
+    "intent": "livelihood/tools",
+    "status": "corrected",
+    "correction_reason": "Original S1765 was Mahila Kisan in Maharashtra; S1793 is Manav Garima Yojana in Gujarat",
+    "db_scheme_name": "Manav Garima Yojana"
+  },
+  {
+    "query_id": "GU_04",
+    "lang": "GU",
+    "query": "ગંગા સ્વરૂપા વિધવા આર્થિક સહાય યોજના ગુજરાત પેન્શન નિયમો",
+    "original_expected_sid": "S1072",
+    "relevant_scheme_ids": ["S1166", "S1167"],
+    "intent": "women/widow_pension",
+    "status": "corrected",
+    "correction_reason": "Original S1072 was Haryana widower assistance; S1166 is Ganga Swarupa Pension Scheme in Gujarat",
+    "db_scheme_name": "Ganga Swarupa Pension Scheme"
+  },
+  {
+    "query_id": "GU_05",
+    "lang": "GU",
+    "query": "ગુજરાત બિનઅનામત શૈક્ષણિક લોન યોજના ઉચ્ચ શિક્ષણ",
+    "original_expected_sid": "S0967",
+    "relevant_scheme_ids": ["S0880", "S0798"],
+    "intent": "education/loan",
+    "status": "corrected",
+    "correction_reason": "Original S0967 was Goa fishermen gill net; S0880 is Educational Study Scheme in Gujarat",
+    "db_scheme_name": "Educational Study Scheme"
+  },
+  {
+    "query_id": "GU_06",
+    "lang": "GU",
+    "query": "ગુજરાતના ખેડૂતો માટે સનેડો કૃષિ સાધન ખરીદી પર સહાય",
+    "original_expected_sid": "S2848",
+    "relevant_scheme_ids": ["S2848"],
+    "intent": "agriculture/equipment",
+    "status": "verified_accurate",
+    "db_scheme_name": "Scheme to Provide Financial Assistance to Farmers for Purchasing Sanedo Agricultural Equipment"
+  },
+  {
+    "query_id": "GU_07",
+    "lang": "GU",
+    "query": "ગુજરાત અનુસૂચિત જાતિ ખેડૂતો માટે જમીન ખરીદી સહાય યોજના",
+    "original_expected_sid": "S0959",
+    "relevant_scheme_ids": ["S0959"],
+    "intent": "sc/land",
+    "status": "verified_accurate",
+    "db_scheme_name": "Financial Assistance Scheme for Purchase of Agricultural Land to Scheduled Caste Farmers"
+  },
+  {
+    "query_id": "GU_08",
+    "lang": "GU",
+    "query": "ગુજરાત સરદાર પટેલ આવાસ યોજના ગ્રામીણ મકાન સહાય",
+    "original_expected_sid": "S2677",
+    "relevant_scheme_ids": ["S2677"],
+    "intent": "housing/rural",
+    "status": "verified_accurate",
+    "db_scheme_name": "Sardar Patel Awas Yojana"
+  },
+  {
+    "query_id": "GU_09",
+    "lang": "GU",
+    "query": "બાંધકામ શ્રમિકો માટે શ્રમિક અન્નપૂર્ણા યોજના 5 રૂપિયામાં ભોજન",
+    "original_expected_sid": "S2889",
+    "relevant_scheme_ids": ["S2931"],
+    "intent": "labor/food",
+    "status": "corrected",
+    "correction_reason": "Original S2889 was Meghalaya seed lab; S2931 is Shramik Annapurna Yojana (GBOCWWB) in Gujarat",
+    "db_scheme_name": "Shramik Annapurna Yojana (GBOCWWB)"
+  },
+  {
+    "query_id": "GU_10",
+    "lang": "GU",
+    "query": "ગુજરાત દિવ્યાંગ વિદ્યાર્થીઓ માટે સાધન સહાય યોજના",
+    "original_expected_sid": "S0156",
+    "relevant_scheme_ids": ["S2510"],
+    "intent": "disability/aids",
+    "status": "corrected",
+    "correction_reason": "Original S0156 was MSME IT assistance; S2510 is Prosthetic Aid and Appliances for Person with Disabilities in Gujarat",
+    "db_scheme_name": "Prosthetic Aid and Appliances for Person with Disabilities"
+  },
+  {
+    "query_id": "GU_11",
+    "lang": "GU",
+    "query": "સરસ્વતી સાધના યોજના ગુજરાત વિદ્યાર્થિનીઓને મફત સાઇકલ",
+    "original_expected_sid": "S2680",
+    "relevant_scheme_ids": ["S1111"],
+    "intent": "girls/bicycle",
+    "status": "corrected",
+    "correction_reason": "Original S2680 was Jharkhand pension; S1111 is Free Cycles to SC Girl Students Studying in Standard IX (Sarasvati Sadhna Yojana)",
+    "db_scheme_name": "Free Cycles to SC Girl Students Studying in Standard IX (Sarasvati Sadhna Yojana)"
+  },
+  {
+    "query_id": "GU_12",
+    "lang": "GU",
+    "query": "ગુજરાત પશુપાલકો માટે 1 થી 20 દુધાળા પશુ યુનિટ વ્યાજ સહાય",
+    "original_expected_sid": "S2845",
+    "relevant_scheme_ids": ["S2708", "S0895"],
+    "intent": "dairy/subsidy",
+    "status": "corrected",
+    "correction_reason": "Original S2845 was market committee processing units; S2708 and S0895 are Establishment of 1 to 20 Milch Animal Farm in Gujarat",
+    "db_scheme_name": "Scheme For Subsidy On Interest For Establishment Of 1 To 20 Milch Animal Farm"
+  },
+  {
+    "query_id": "GU_13",
+    "lang": "GU",
+    "query": "વહાલી દીકરી યોજના પ્રથમ હપ્તો અને પાત્રતા શરતો",
+    "original_expected_sid": "S3290",
+    "relevant_scheme_ids": ["S3268"],
+    "intent": "girls/incentive",
+    "status": "corrected",
+    "correction_reason": "Original S3290 was day care in MP; S3268 is Vahli Dikri Yojana in Gujarat",
+    "db_scheme_name": "Vahli Dikri Yojana"
+  },
+  {
+    "query_id": "GU_14",
+    "lang": "GU",
+    "query": "ગુજરાત વનબંધુ કલ્યાણ યોજના આદિજાતિ સર્વાંગી વિકાસ",
+    "original_expected_sid": "S3292",
+    "relevant_scheme_ids": ["S3270"],
+    "intent": "tribal/development",
+    "status": "corrected",
+    "correction_reason": "Original S3292 was MP Vikramaditya Yojna; S3270 is Vanbandhu Kalyan Yojana",
+    "db_scheme_name": "Vanbandhu Kalyan Yojana"
+  }
+]
