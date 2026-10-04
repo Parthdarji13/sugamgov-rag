@@ -165,37 +165,37 @@ The corpus consists of **3,397 verified Indian government schemes** across Centr
 
 ---
 
-## 6. Database Setup
+## 6. Installation & Python Environment
 
-The backend requires **PostgreSQL 15+** with the **`pgvector`** extension enabled.
+Execute the following commands in Windows PowerShell:
 
-- **Database Name:** `sugamgov`
-- **User:** `postgres` (or your configured user)
-- **Port:** `5432`
+### Step 1: Clone Repository
+```powershell
+git clone https://github.com/Parthdarji13/sugamgov-rag.git
+cd sugamgov-rag
+```
 
-### Applying Migrations
+### Step 2: Python Version & Virtual Environment
+Ensure **Python 3.11 or 3.12** (64-bit) is installed. Create and activate a dedicated virtual environment:
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
 
-1. Connect to PostgreSQL and create the database:
-   ```sql
-   CREATE DATABASE sugamgov;
-   ```
-2. Apply Migration 001 (enables `pgvector` and creates core tables):
-   ```bash
-   psql -U postgres -d sugamgov -f database/migrations/001_initial_schema.sql
-   ```
-3. Populate Data & Embeddings:
-   - Ingest schemes: `python scripts/04_ingest_schemes.py`
-   - Generate chunks: `python scripts/06_chunk_schemes.py`
-   - Generate local embeddings: `python scripts/18_generate_local_embeddings.py`
-4. Apply Migration 002 (adds generated tsvector, GIN index, and HNSW index):
-   ```bash
-   psql -U postgres -d sugamgov -f database/migrations/002_add_fts_and_hnsw_indexes.sql
-   ```
+### Step 3: Upgrade Pip & Install Dependencies
+Install all required dependencies:
+```powershell
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+*Note: On first server startup, the local embedding model `intfloat/multilingual-e5-small` (~1.1 GB weights) will be automatically downloaded and cached in your HuggingFace cache directory.*
 
 ---
 
 ## 7. Environment Variables
 
+### Step 4: Configure `.env`
 Copy the provided template to create your `.env` file:
 ```powershell
 Copy-Item .env.example .env
@@ -218,37 +218,76 @@ Configure the following variables in `.env`:
 
 ---
 
-## 8. Installation
+## 8. Database Setup & Handover Restore
 
-Execute the following commands in Windows PowerShell:
+### Step 5: PostgreSQL & pgvector Setup
+The backend requires **PostgreSQL 15+** with the **`pgvector`** extension enabled.
+- **Database Name:** `sugamgov`
+- **User:** `postgres` (or your configured user)
+- **Port:** `5432`
 
-```powershell
-# 1. Clone repository
-git clone https://github.com/Parthdarji13/sugamgov-rag.git
-cd sugamgov-rag
+---
 
-# 2. Create and activate virtual environment
-python -m venv .venv
-.venv\Scripts\Activate.ps1
+### Step 6: Database Setup / Restore Options
 
-# 3. Upgrade pip and install dependencies
-pip install --upgrade pip
-pip install -r requirements.txt
+#### Option A (Recommended): Fast-Path Restore from Backup (< 30 seconds)
+An existing, verified PostgreSQL database backup is available separately from Git for new developers:
+**`sugamgov_backup.dump`** (~48 MB custom-format pg_dump archive).
 
-# 4. Configure environment
-Copy-Item .env.example .env
-# Edit .env and supply your local DATABASE_URL and GEMINI_API_KEY
+> [!IMPORTANT]
+> - **Production Knowledge Base:** This restores the existing production knowledge base (3,397 schemes, 20,497 chunks, 100% pre-computed 384-dimensional `embedding_local` vectors, full-text search `search_vector`, GIN index, and HNSW vector index).
+> - **Avoids Regeneration:** It avoids regenerating the 20,497 local embeddings (saving ~45–60 minutes of computation).
+> - **Archive Size:** The backup archive is approximately 48 MB.
+> - **Excluded by Git:** The dump is intentionally excluded by `.gitignore` to keep repository size lean; it must **NOT** be committed to Git.
+> - **Developer Handover:** The backup must be transferred separately to a new developer as part of the onboarding package.
+> - **Fresh Database Only:** The restore command should be used **only when setting up a fresh database**. Do NOT run this against an existing populated database without appropriate care (e.g. drop or rename the existing database first).
 
-# 5. Verify database connection
-python scripts/03_test_database.py
-```
+**Restore Commands:**
 
-*Note: On first startup, the local embedding model `intfloat/multilingual-e5-small` (~1.1 GB weights) will be automatically downloaded and cached in your HuggingFace cache directory.*
+1. Create the database:
+   ```bash
+   createdb -h localhost -p 5432 -U postgres sugamgov
+   ```
+2. Restore the database archive:
+   ```bash
+   pg_restore -h localhost -p 5432 -U postgres -d sugamgov -v -j 4 sugamgov_backup.dump
+   ```
+3. Verify database connection and vector tables:
+   ```powershell
+   python scripts/03_test_database.py
+   ```
+
+---
+
+#### Option B: Build Knowledge Base from Scratch (~45–60 minutes)
+If starting from scratch without `sugamgov_backup.dump`:
+
+1. Connect to PostgreSQL and create the database:
+   ```sql
+   CREATE DATABASE sugamgov;
+   ```
+2. Apply Migration 001 (enables `pgvector` and creates core tables):
+   ```bash
+   psql -U postgres -d sugamgov -f database/migrations/001_initial_schema.sql
+   ```
+3. Populate Data & Embeddings:
+   - Ingest schemes: `python scripts/04_ingest_schemes.py`
+   - Generate chunks: `python scripts/06_chunk_schemes.py`
+   - Generate local embeddings: `python scripts/18_generate_local_embeddings.py` (takes ~45–60 minutes)
+4. Apply Migration 002 (adds generated tsvector, GIN index, and HNSW index):
+   ```bash
+   psql -U postgres -d sugamgov -f database/migrations/002_add_fts_and_hnsw_indexes.sql
+   ```
+5. Verify database integrity:
+   ```powershell
+   python scripts/03_test_database.py
+   ```
 
 ---
 
 ## 9. Running the Backend
 
+### Step 7: Launch FastAPI Server
 Launch the FastAPI development server:
 ```powershell
 uvicorn api.main:app --reload --port 8000
@@ -261,7 +300,9 @@ uvicorn api.main:app --reload --port 8000
 
 ---
 
-## 10. API Endpoints
+## 10. API Endpoints & Verification
+
+### Step 8: Verify API Endpoints
 
 ### System Endpoints
 - `GET /health`
@@ -363,6 +404,8 @@ python scripts/28_evaluate_rag_answer_quality.py
 
 ## 12. Frontend Integration
 
+### Step 9: Connect Next.js Frontend
+
 The backend is pre-configured to integrate seamlessly with the **Sugamai** Next.js 16 frontend:
 - **Backend URL Configuration (`RAG_API_URL`):** The Next.js frontend connects to this FastAPI RAG backend using the `RAG_API_URL` environment variable (configured in the frontend's `.env.local`):
   ```bash
@@ -405,11 +448,11 @@ The backend is pre-configured to integrate seamlessly with the **Sugamai** Next.
 
 ## 15. Handover Notes for New Developers
 
-Before running the project on a new workstation, ensure you have:
-1. **PostgreSQL 15+** installed with the `vector` extension (`CREATE EXTENSION vector;`).
-2. A `.env` file containing a valid `DATABASE_URL` pointing to your local PostgreSQL instance and a valid `GEMINI_API_KEY`.
-3. If starting from an empty database, execute migrations `001` and `002`, then run ingestion scripts `scripts/04_ingest_schemes.py`, `scripts/06_chunk_schemes.py`, and `scripts/18_generate_local_embeddings.py`.
-4. Ensure your system has sufficient RAM (~2 GB) to load `intfloat/multilingual-e5-small` in memory.
+Before running the project on a new workstation, follow the recommended setup flow:
+1. **Python Environment:** Ensure Python 3.11 or 3.12 is installed, create `.venv`, and run `pip install -r requirements.txt`.
+2. **Environment Configuration:** Copy `.env.example` to `.env` and supply valid `DATABASE_URL` and `GEMINI_API_KEY`.
+3. **Database Setup & Restore:** Ensure **PostgreSQL 15+** with the `vector` extension is installed. Fast-restore the production knowledge base using `sugamgov_backup.dump` via `pg_restore` (Option A in Section 8), or rebuild from scratch using migrations `001` and `002` and scripts `04`, `06`, and `18` (Option B).
+4. **Hardware Requirements:** Ensure your system has sufficient RAM (~2 GB) to load `intfloat/multilingual-e5-small` in memory.
 
 ---
 
