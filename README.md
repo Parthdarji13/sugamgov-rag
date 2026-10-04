@@ -364,7 +364,11 @@ python scripts/28_evaluate_rag_answer_quality.py
 ## 12. Frontend Integration
 
 The backend is pre-configured to integrate seamlessly with the **Sugamai** Next.js 16 frontend:
-- **CORS Allowed Origins:** Default includes `http://localhost:3000` and `http://127.0.0.1:3000`.
+- **Backend URL Configuration (`RAG_API_URL`):** The Next.js frontend connects to this FastAPI RAG backend using the `RAG_API_URL` environment variable (configured in the frontend's `.env.local`):
+  ```bash
+  RAG_API_URL=http://127.0.0.1:8000
+  ```
+- **CORS Allowed Origins:** Default includes `http://localhost:3000` and `http://127.0.0.1:3000` (configured via `CORS_ORIGINS`).
 - **Chat Routing:** The Next.js chat route forwards citizen queries to `POST /api/chat/stream` and parses incoming Server-Sent Events.
 - **Session Handling:** Frontend session tokens can be mapped directly to `session_id` query parameters.
 
