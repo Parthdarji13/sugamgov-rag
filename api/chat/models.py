@@ -52,6 +52,12 @@ class SessionData:
 # API Request & Response Schemas
 # ============================================================================
 
+class ChatHistoryItem(BaseModel):
+    """Previous turn message to seed conversational context."""
+    role: str = Field(..., description="'user' or 'assistant'")
+    content: str = Field(..., description="Message text content")
+
+
 class ChatRequest(BaseModel):
     """
     Request payload for multi-turn conversational chat endpoint (POST /api/chat).
@@ -65,6 +71,10 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = Field(
         default=None,
         description="Optional session identifier for multi-turn conversation. If omitted, a new session is created.",
+    )
+    history: Optional[List[ChatHistoryItem]] = Field(
+        default=None,
+        description="Optional list of previous messages in the conversation to restore context if session is fresh.",
     )
     language: Optional[str] = Field(
         default="auto",

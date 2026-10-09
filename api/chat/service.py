@@ -197,17 +197,33 @@ class ChatService:
         if request.session_id:
             session = self.session_store.get_session(request.session_id)
             if not session:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Session '{request.session_id}' not found. Omit session_id to start a new chat session.",
-                )
+                # Automatically restore/create session with requested ID instead of failing
+                session = self.session_store.create_session(session_id=request.session_id)
         else:
             session = self.session_store.create_session()
+
+        # Seed session from request.history if session messages are empty
+        if not session.messages and request.history:
+            import time
+            for item in request.history:
+                if item.content and item.content.strip():
+                    session.messages.append(
+                        ChatMessage(role=item.role, content=item.content.strip(), timestamp=time.time())
+                    )
+            if len(session.messages) > self.session_store.max_history_messages:
+                session.messages = session.messages[-self.session_store.max_history_messages:]
 
         # 2. Formulate Retrieval Query
         retrieval_query = build_conversational_query(
             current_message=request.message,
             previous_messages=session.messages,
+        )
+        logger.info(
+            "\n" + "="*70 +
+            "\n[PIPELINE] USER QUERY   : %s" +
+            "\n[PIPELINE] RETRIEVAL QUERY (sent to DB): %s" +
+            "\n" + "="*70,
+            request.message, retrieval_query
         )
 
         # 3. Retrieve Evidence from Database
@@ -229,6 +245,38 @@ class ChatService:
 
         # 4. Build Evidence Context
         evidence_context = self.context_builder.build(retrieval_response=retrieval_response)
+
+        # ── RAG Retrieval Summary Log ─────────────────────────────────────────
+        scheme_names_found = [s.scheme_name for s in evidence_context.schemes]
+        chunk_count = sum(len(s.evidence_chunks) for s in evidence_context.schemes)
+        logger.info(
+            "\n" + "-"*70 +
+            "\n[RAG RETRIEVAL] Schemes found in DB  : %d  →  %s" +
+            "\n[RAG RETRIEVAL] Evidence chunks total : %d" +
+            "\n[RAG RETRIEVAL] Retrieval method      : %s" +
+            "\n[RAG RETRIEVAL] Is grounded?          : %s" +
+            "\n" + "-"*70,
+            retrieval_response.total_results,
+            scheme_names_found,
+            chunk_count,
+            retrieval_response.retrieval_method,
+            str(evidence_context.total_schemes > 0),
+        )
+        if evidence_context.total_schemes == 0:
+            logger.warning(
+                "[RAG RETRIEVAL] ⚠️  NO evidence found in DB for query: '%s' — "
+                "Gemini will NOT be called; deterministic no-evidence reply will be returned.",
+                retrieval_query,
+            )
+        else:
+            for s in evidence_context.schemes:
+                for c in s.evidence_chunks:
+                    logger.debug(
+                        "[RAG CHUNK] scheme='%s'  field='%s'  score=%.4f  text_preview='%s'",
+                        s.scheme_name, c.field_name,
+                        getattr(c, 'score', 0.0),
+                        (c.chunk_text[:120].replace('\n', ' ') + '...') if c.chunk_text else '',
+                    )
 
         # 5. Generate Grounded Answer
         # Uses the user's actual question as the prompt target, with evidence retrieved via conversational query
@@ -255,6 +303,26 @@ class ChatService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Grounded answer generation failed to complete.",
             )
+
+        # ── Final Answer Log ──────────────────────────────────────────────────
+        logger.info(
+            "\n" + "="*70 +
+            "\n[GEMINI RESPONSE] grounded=%s  confidence=%s  language=%s" +
+            "\n[GEMINI RESPONSE] raw answer (first 500 chars):\n%s" +
+            "\n" + "="*70,
+            rag_answer.grounded, rag_answer.confidence, rag_answer.language,
+            rag_answer.answer[:500],
+        )
+        logger.info(
+            "\n" + "*"*70 +
+            "\n[FINAL → USER] answer length=%d chars  grounded=%s  confidence=%s" +
+            "\n[FINAL → USER] schemes cited: %s" +
+            "\n" + "*"*70,
+            len(rag_answer.answer),
+            rag_answer.grounded,
+            rag_answer.confidence,
+            [s.get('scheme_name', '') if isinstance(s, dict) else getattr(s, 'scheme_name', str(s)) for s in rag_answer.schemes],
+        )
 
         # 6. Record Conversation Turn
         self.session_store.add_turn(
@@ -323,17 +391,33 @@ class ChatService:
         if request.session_id:
             session = self.session_store.get_session(request.session_id)
             if not session:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Session '{request.session_id}' not found. Omit session_id to start a new chat session.",
-                )
+                # Automatically restore/create session with requested ID instead of failing
+                session = self.session_store.create_session(session_id=request.session_id)
         else:
             session = self.session_store.create_session()
+
+        # Seed session from request.history if session messages are empty
+        if not session.messages and request.history:
+            import time
+            for item in request.history:
+                if item.content and item.content.strip():
+                    session.messages.append(
+                        ChatMessage(role=item.role, content=item.content.strip(), timestamp=time.time())
+                    )
+            if len(session.messages) > self.session_store.max_history_messages:
+                session.messages = session.messages[-self.session_store.max_history_messages:]
 
         # 2. Formulate Retrieval Query
         retrieval_query = build_conversational_query(
             current_message=request.message,
             previous_messages=session.messages,
+        )
+        logger.info(
+            "\n" + "="*70 +
+            "\n[PIPELINE STREAM] USER QUERY          : %s" +
+            "\n[PIPELINE STREAM] RETRIEVAL QUERY (DB): %s" +
+            "\n" + "="*70,
+            request.message, retrieval_query
         )
 
         # 3. Retrieve Evidence from Database
@@ -355,6 +439,36 @@ class ChatService:
 
         # 4. Build Evidence Context
         evidence_context = self.context_builder.build(retrieval_response=retrieval_response)
+
+        # ── RAG Retrieval Summary Log (streaming path) ────────────────────────
+        stream_scheme_names = [s.scheme_name for s in evidence_context.schemes]
+        stream_chunk_count = sum(len(s.evidence_chunks) for s in evidence_context.schemes)
+        logger.info(
+            "\n" + "-"*70 +
+            "\n[RAG RETRIEVAL STREAM] Schemes found in DB  : %d  →  %s" +
+            "\n[RAG RETRIEVAL STREAM] Evidence chunks total : %d" +
+            "\n[RAG RETRIEVAL STREAM] Retrieval method      : %s" +
+            "\n" + "-"*70,
+            retrieval_response.total_results,
+            stream_scheme_names,
+            stream_chunk_count,
+            retrieval_response.retrieval_method,
+        )
+        if evidence_context.total_schemes == 0:
+            logger.warning(
+                "[RAG RETRIEVAL STREAM] ⚠️  NO evidence found in DB for query: '%s' — "
+                "Gemini will NOT be called; deterministic no-evidence reply will be returned.",
+                retrieval_query,
+            )
+        else:
+            for s in evidence_context.schemes:
+                for c in s.evidence_chunks:
+                    logger.debug(
+                        "[RAG CHUNK STREAM] scheme='%s'  field='%s'  score=%.4f  text_preview='%s'",
+                        s.scheme_name, c.field_name,
+                        getattr(c, 'score', 0.0),
+                        (c.chunk_text[:120].replace('\n', ' ') + '...') if c.chunk_text else '',
+                    )
 
         # 5. Extract Metadata & Citations
         is_empty = (evidence_context.total_schemes == 0)
@@ -411,6 +525,13 @@ class ChatService:
 
         # 7. Progressive Streaming via RAGGenerator
         streamed_tokens: List[str] = []
+        logger.info(
+            "[GEMINI CALL STREAM] Sending evidence context to Gemini — "
+            "%d schemes, %d chunks, language='%s'",
+            evidence_context.total_schemes,
+            sum(len(s.evidence_chunks) for s in evidence_context.schemes),
+            target_lang,
+        )
         try:
             for chunk_text in self.rag_generator.generate_stream(
                 query=request.message,
@@ -431,6 +552,23 @@ class ChatService:
             ]
             is_grounded = not any(m in full_answer.lower() for m in insufficient_markers)
             final_confidence = confidence if is_grounded else "low"
+
+            logger.info(
+                "\n" + "="*70 +
+                "\n[GEMINI RESPONSE STREAM] grounded=%s  confidence=%s  total_chars=%d" +
+                "\n[GEMINI RESPONSE STREAM] raw answer (first 500 chars):\n%s" +
+                "\n" + "="*70,
+                is_grounded, final_confidence, len(full_answer),
+                full_answer[:500],
+            )
+            logger.info(
+                "\n" + "*"*70 +
+                "\n[FINAL → USER STREAM] answer length=%d chars  grounded=%s  confidence=%s" +
+                "\n[FINAL → USER STREAM] schemes cited: %s" +
+                "\n" + "*"*70,
+                len(full_answer), is_grounded, final_confidence,
+                stream_scheme_names,
+            )
 
             # Store turn only on complete success
             self.session_store.add_turn(

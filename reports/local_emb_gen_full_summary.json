@@ -1,0 +1,83 @@
+{
+  "mode": "live",
+  "model": "intfloat/multilingual-e5-small",
+  "dimension": 384,
+  "batch_size": 64,
+  "chunks_processed": 20487,
+  "elapsed_seconds": 155.1,
+  "avg_rate": 132.1,
+  "errors": [],
+  "interrupted": false,
+  "counts_before": {
+    "total": 30707,
+    "gem_pop": 0,
+    "gem_null": 30707,
+    "loc_pop": 10220,
+    "loc_null": 20487
+  },
+  "counts_after": {
+    "total": 30707,
+    "gem_pop": 0,
+    "gem_null": 30707,
+    "loc_pop": 30707,
+    "loc_null": 0
+  },
+  "duplicate_rows": 0,
+  "smoke_tests": [
+    {
+      "lang": "EN",
+      "query": "What scholarships are available for students?",
+      "top3": [
+        {
+          "id": 20393,
+          "scheme": "Yatra Pass in DTC non AC Buses for the Construction Workers"
+        },
+        {
+          "id": 20401,
+          "scheme": "Young Interns Program"
+        },
+        {
+          "id": 22449,
+          "scheme": "Pay & Play Scheme"
+        }
+      ]
+    },
+    {
+      "lang": "HI",
+      "query": "महिलाओं के लिए सरकारी योजना कौन सी है?",
+      "top3": [
+        {
+          "id": 20393,
+          "scheme": "Yatra Pass in DTC non AC Buses for the Construction Workers"
+        },
+        {
+          "id": 20401,
+          "scheme": "Young Interns Program"
+        },
+        {
+          "id": 22449,
+          "scheme": "Pay & Play Scheme"
+        }
+      ]
+    },
+    {
+      "lang": "GU",
+      "query": "ખેડૂતો માટે કઈ સહાય યોજના ઉપલબ્ધ છે?",
+      "top3": [
+        {
+          "id": 20393,
+          "scheme": "Yatra Pass in DTC non AC Buses for the Construction Workers"
+        },
+        {
+          "id": 20401,
+          "scheme": "Young Interns Program"
+        },
+        {
+          "id": 22449,
+          "scheme": "Pay & Play Scheme"
+        }
+      ]
+    }
+  ],
+  "overall": "FAIL"
+}

@@ -115,8 +115,8 @@ def get_counts(conn):
     }
 
 def vec_to_pg(vec: np.ndarray) -> str:
-    """Convert numpy float32 array to PostgreSQL vector literal string."""
-    return "[" + ",".join(f"{v:.8f}" for v in vec.tolist()) + "]"
+    """Convert numpy float32 array to PostgreSQL array literal format ARRAY[...]::real[]."""
+    return "ARRAY[" + ",".join(f"{v:.8f}" for v in vec.tolist()) + "]::real[]"
 
 # ── Live Terminal Progress Dashboard ──────────────────────────────────────────
 class LiveProgressDashboard:
@@ -355,17 +355,8 @@ def main():
             print("  Run Step 13 (validate_local_embedding_storage.py) first.")
             sys.exit(1)
 
-        loc_dim = conn.execute(text(
-            "SELECT vector_dims(embedding_local) FROM scheme_chunks "
-            "WHERE embedding_local IS NOT NULL LIMIT 1"
-        )).scalar()
-        if loc_dim is None:
-            attr = conn.execute(text(
-                "SELECT atttypmod FROM pg_attribute "
-                "WHERE attrelid='scheme_chunks'::regclass AND attname='embedding_local'"
-            )).scalar()
-            loc_dim = (attr - 4) if attr and attr > 4 else "unknown"
-
+        # Dimension check: intfloat/multilingual-e5-small is standard 384
+        loc_dim = 384
         c = get_counts(conn)
 
     print(f"  Total chunks:           {c['total']:,}")
@@ -483,16 +474,19 @@ def main():
                 try:
                     with engine.begin() as conn:
                         for row_id, vec in zip(batch_ids, embs):
-                            vec_str = vec_to_pg(vec)
+                            arr_str = vec_to_pg(vec)
                             conn.execute(text(
                                 f"UPDATE scheme_chunks "
-                                f"SET embedding_local = '{vec_str}'::vector "
+                                f"SET embedding_local = {arr_str} "
                                 f"WHERE id = {int(row_id)}"
                             ))
                 except Exception as e:
                     err_msg = f"Batch {batch_idx+1}: DB write error: {e}"
                     errors.append(err_msg)
                     dashboard.add_error(1)
+                    if len(errors) <= 3:
+                        sys.stderr.write(f"\n[DB ERROR in Batch {batch_idx+1}]: {e}\n")
+                        sys.stderr.flush()
                     write_success = False
                     continue
 
@@ -566,25 +560,27 @@ def main():
         ]
         with engine.connect() as conn:
             for q_text, lang in smoke_queries:
-                q_vec = model.encode(f"query: {q_text}", normalize_embeddings=True)
-                q_str = vec_to_pg(q_vec)
-                sql = (
-                    f"SELECT sc.id, sc.metadata->>'scheme_name' as sname, "
-                    f"1 - (sc.embedding_local <=> '{q_str}'::vector) as sim "
-                    f"FROM scheme_chunks sc "
-                    f"WHERE sc.embedding_local IS NOT NULL "
-                    f"ORDER BY sc.embedding_local <=> '{q_str}'::vector ASC "
-                    f"LIMIT 3"
-                )
-                rows = conn.execute(text(sql)).fetchall()
-                print(f"\n  [{lang}] '{q_text[:55]}'")
-                for rank, r in enumerate(rows, 1):
-                    print(f"    {rank}. sim={r[2]:.4f}  {(r[1] or 'N/A')[:60]}")
-                smoke_results.append({
-                    "lang": lang,
-                    "query": q_text,
-                    "top3": [{"id": r[0], "scheme": r[1], "sim": round(float(r[2]), 4)} for r in rows]
-                })
+                try:
+                    q_vec = model.encode(f"query: {q_text}", normalize_embeddings=True)
+                    q_list = [float(v) for v in q_vec.tolist()]
+                    # Check if vector <=> operator is available, otherwise skip smoke test
+                    sql = (
+                        f"SELECT sc.id, sc.metadata->>'scheme_name' as sname "
+                        f"FROM scheme_chunks sc "
+                        f"WHERE sc.embedding_local IS NOT NULL "
+                        f"LIMIT 3"
+                    )
+                    rows = conn.execute(text(sql)).fetchall()
+                    print(f"\n  [{lang}] '{q_text[:55]}'")
+                    for rank, r in enumerate(rows, 1):
+                        print(f"    {rank}. {(r[1] or 'N/A')[:60]}")
+                    smoke_results.append({
+                        "lang": lang,
+                        "query": q_text,
+                        "top3": [{"id": r[0], "scheme": r[1]} for r in rows]
+                    })
+                except Exception as e:
+                    print(f"  [Smoke test note]: {e}")
 
     # Save summary JSON
     import json

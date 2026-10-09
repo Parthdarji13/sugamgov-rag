@@ -47,8 +47,15 @@ from src.generation.rag_generator import RAGGenerator
 # Setup sanitized logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    format="%(asctime)s [%(levelname)-8s] %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
 )
+
+# Enable DEBUG-level logging for the RAG pipeline loggers
+# so you can see full chunk-level detail from your database
+for _pipeline_logger in ("sugamgov_api", "sugamgov_chat", "sugamgov_generator"):
+    logging.getLogger(_pipeline_logger).setLevel(logging.DEBUG)
+
 logger = logging.getLogger("sugamgov_api")
 
 
@@ -60,9 +67,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         from src.retrieval.vector_retriever import get_embedding_model
         logger.info("Pre-warming local multilingual embedding model (intfloat/multilingual-e5-small)...")
         get_embedding_model()
-        logger.info("Local multilingual embedding model pre-warmed and ready.")
+        from src.retrieval.scheme_resolver import get_scheme_resolver
+        logger.info("Pre-warming SchemeResolver catalog...")
+        get_scheme_resolver()
+        logger.info("SchemeResolver catalog pre-warmed and ready.")
     except Exception as e:
-        logger.warning("Could not pre-warm embedding model at startup: %s", e)
+        logger.warning("Could not pre-warm models/catalog at startup: %s", e)
     yield
     logger.info("SugamGov AI RAG API shutting down...")
     reset_dependencies()
@@ -143,6 +153,16 @@ async def global_exception_handler(request, exc: Exception):
 # ============================================================================
 # Endpoints
 # ============================================================================
+
+@app.get("/", summary="Root Endpoint", include_in_schema=False)
+async def root():
+    """Root route providing welcome message and documentation links."""
+    return {
+        "message": "Welcome to SugamGov AI RAG API",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
 
 @app.get(
     "/health",

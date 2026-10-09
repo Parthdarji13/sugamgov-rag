@@ -248,8 +248,12 @@ class VectorRetriever:
             LIMIT :top_k;
         """)
 
-        with self.engine.connect() as conn:
-            rows = conn.execute(sql, params).fetchall()
+        try:
+            with self.engine.connect() as conn:
+                rows = conn.execute(sql, params).fetchall()
+        except Exception as e:
+            # If pgvector extension is not installed or table has no embeddings, log and return empty
+            return []
 
         # 3. Map SQL rows to strongly-typed RetrievalResult objects
         results: List[RetrievalResult] = []

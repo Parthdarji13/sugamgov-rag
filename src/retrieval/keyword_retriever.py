@@ -248,6 +248,168 @@ class KeywordRetriever:
 
         return results
 
+    def retrieve_by_scheme_name(
+        self,
+        scheme_name_query: str,
+        state: Optional[str] = None,
+        level: Optional[str] = None,
+        category: Optional[str] = None,
+        top_k: int = 10,
+    ) -> List[RetrievalResult]:
+        """
+        Retrieves scheme chunks by directly matching scheme_name using ILIKE.
+        This bypasses FTS entirely and is critical for short/acronym queries
+        like 'pm kisan' where FTS may fail.
+
+        Strategy:
+          1. Try exact ILIKE match with the full query string
+          2. If <3 results, also try matching each significant word (>= 4 chars)
+             individually against scheme_name (OR logic)
+
+        Args:
+            scheme_name_query: Scheme name or partial name to search (e.g. 'Pradhan Mantri Kisan Samman Nidhi')
+            state: Optional state filter
+            level: Optional level filter
+            category: Optional category filter
+            top_k: Maximum number of results to return
+
+        Returns:
+            List of RetrievalResult objects from matching schemes, scored by a fixed high relevance.
+        """
+        clean_query = scheme_name_query.strip()
+        if not clean_query:
+            return []
+
+        top_k = max(1, top_k)
+
+        # Build metadata filter clauses
+        filter_clauses = []
+        params: Dict[str, Any] = {"top_k": top_k}
+
+        if state:
+            filter_clauses.append("""(
+                s.state ILIKE :state 
+                OR EXISTS (
+                    SELECT 1 FROM jsonb_array_elements_text(s.states) st 
+                    WHERE st ILIKE :state
+                )
+            )""")
+            params["state"] = state.strip()
+
+        if level:
+            filter_clauses.append("s.level ILIKE :level")
+            params["level"] = level.strip()
+
+        if category:
+            filter_clauses.append("""EXISTS (
+                SELECT 1 FROM jsonb_array_elements_text(s.categories) cat 
+                WHERE cat ILIKE :category
+            )""")
+            params["category"] = f"%{category.strip()}%"
+
+        where_filters = ""
+        if filter_clauses:
+            where_filters = "AND " + " AND ".join(filter_clauses)
+
+        # Strategy 1: Full phrase ILIKE match
+        params["name_pattern"] = f"%{clean_query}%"
+        sql_name = text(f"""
+            SELECT 
+                c.chunk_id,
+                c.scheme_id,
+                s.scheme_name,
+                c.field_name,
+                c.chunk_text,
+                c.metadata,
+                s.state,
+                s.level,
+                s.categories
+            FROM scheme_chunks c
+            JOIN schemes s ON c.scheme_id = s.scheme_id
+            WHERE s.scheme_name ILIKE :name_pattern
+              {where_filters}
+            ORDER BY
+                CASE WHEN c.field_name = 'scheme_name' THEN 0
+                     WHEN c.field_name = 'benefits' THEN 1
+                     WHEN c.field_name = 'eligibility_criteria' THEN 2
+                     ELSE 3
+                END,
+                c.id ASC
+            LIMIT :top_k;
+        """)
+
+        all_rows = []
+        with self.engine.connect() as conn:
+            rows = conn.execute(sql_name, params).fetchall()
+            all_rows.extend(rows)
+
+            # Strategy 2: If not enough results, try individual significant words (OR)
+            if len(all_rows) < 3:
+                words = [w for w in re.findall(r'\b[A-Za-z0-9]+\b', clean_query) if len(w) >= 4]
+                if words:
+                    # Build OR ILIKE conditions for each word
+                    word_conditions = []
+                    for i, word in enumerate(words[:6]):  # Limit to 6 words
+                        param_key = f"word_{i}"
+                        word_conditions.append(f"s.scheme_name ILIKE :{param_key}")
+                        params[param_key] = f"%{word}%"
+
+                    if word_conditions:
+                        existing_ids = {r.chunk_id for r in all_rows}
+                        word_where = " OR ".join(word_conditions)
+                        sql_words = text(f"""
+                            SELECT 
+                                c.chunk_id,
+                                c.scheme_id,
+                                s.scheme_name,
+                                c.field_name,
+                                c.chunk_text,
+                                c.metadata,
+                                s.state,
+                                s.level,
+                                s.categories
+                            FROM scheme_chunks c
+                            JOIN schemes s ON c.scheme_id = s.scheme_id
+                            WHERE ({word_where})
+                              {where_filters}
+                            ORDER BY
+                                CASE WHEN c.field_name = 'scheme_name' THEN 0
+                                     WHEN c.field_name = 'benefits' THEN 1
+                                     WHEN c.field_name = 'eligibility_criteria' THEN 2
+                                     ELSE 3
+                                END,
+                                c.id ASC
+                            LIMIT :top_k;
+                        """)
+                        word_rows = conn.execute(sql_words, params).fetchall()
+                        for wr in word_rows:
+                            if str(wr.chunk_id) not in existing_ids:
+                                all_rows.append(wr)
+
+        # Map to RetrievalResult with a fixed high relevance score
+        # (these are direct name matches, so they're highly relevant)
+        results: List[RetrievalResult] = []
+        for row in all_rows[:top_k]:
+            cats = row.categories if isinstance(row.categories, list) else []
+            meta = row.metadata if isinstance(row.metadata, dict) else {}
+
+            results.append(
+                RetrievalResult(
+                    chunk_id=str(row.chunk_id),
+                    scheme_id=str(row.scheme_id),
+                    scheme_name=str(row.scheme_name),
+                    field_name=str(row.field_name),
+                    chunk_text=str(row.chunk_text),
+                    score=0.5,  # High fixed score — direct name match is very relevant
+                    metadata=meta,
+                    state=row.state,
+                    level=row.level,
+                    categories=cats,
+                )
+            )
+
+        return results
+
 
 def retrieve_keywords(
     query: str,

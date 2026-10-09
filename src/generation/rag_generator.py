@@ -40,6 +40,8 @@ Key Capabilities:
 """
 
 import os
+import re
+import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
@@ -52,6 +54,30 @@ from src.generation.prompt import (
     detect_language,
     build_grounded_prompt,
 )
+
+logger = logging.getLogger("sugamgov_generator")
+
+# Matches patterns like:
+# [S2080 / S2080_scheme_name_0]
+# [S2080 / S2080_benefits_0]
+# [S2080_eligibility_0]
+# [S2080]
+# [LMS_xyz]
+CITATION_REGEX = re.compile(
+    r"\[\s*(?:S\d+|LMS_)[A-Za-z0-9_\-]*(?:\s*(?:/|-)\s*[A-Za-z0-9_\-]+)*\s*\]",
+    re.IGNORECASE
+)
+
+def strip_technical_citations(text: str) -> str:
+    """Removes ugly internal database/chunk bracketed codes like [S2080_eligibility_0] from user text."""
+    if not text:
+        return ""
+    # Strip citation tags
+    cleaned = CITATION_REGEX.sub("", text)
+    # Clean up double spaces left by removal before punctuation or words
+    cleaned = re.sub(r" +([.,!?:;])", r"\1", cleaned)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    return cleaned.strip()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
@@ -196,6 +222,20 @@ class RAGGenerator:
             language=target_lang,
         )
 
+        # Log the prompt being sent to Gemini
+        prompt_preview = str(prompt_content)[:800] if prompt_content else ''
+        logger.info(
+            "\n" + "-"*70 +
+            "\n[GEMINI PROMPT] model=%s  language=%s" +
+            "\n[GEMINI PROMPT] Evidence schemes count: %d" +
+            "\n[GEMINI PROMPT] prompt preview (first 800 chars):\n%s" +
+            "\n" + "-"*70,
+            self.model_name,
+            target_lang,
+            evidence_context.total_schemes if evidence_context else 0,
+            prompt_preview,
+        )
+
         # 4. Invoke Gemini Generation API
         try:
             from google.genai import types
@@ -210,6 +250,17 @@ class RAGGenerator:
             )
 
             raw_answer = response.text.strip() if response and response.text else ""
+            cleaned_answer = strip_technical_citations(raw_answer)
+
+            # Log Gemini raw response
+            logger.info(
+                "\n" + "-"*70 +
+                "\n[GEMINI RAW RESPONSE] length=%d chars" +
+                "\n[GEMINI RAW RESPONSE] text (first 800 chars):\n%s" +
+                "\n" + "-"*70,
+                len(raw_answer),
+                raw_answer[:800],
+            )
 
             # Check if model reported insufficient information
             insufficient_markers = [
@@ -222,7 +273,7 @@ class RAGGenerator:
 
             return RAGAnswer(
                 query=clean_query,
-                answer=raw_answer,
+                answer=cleaned_answer,
                 language=target_lang,
                 grounded=is_grounded,
                 confidence=confidence if is_grounded else "low",
@@ -276,6 +327,20 @@ class RAGGenerator:
             language=target_lang,
         )
 
+        # Log the prompt being sent to Gemini (streaming)
+        prompt_preview = str(prompt_content)[:800] if prompt_content else ''
+        logger.info(
+            "\n" + "-"*70 +
+            "\n[GEMINI PROMPT STREAM] model=%s  language=%s" +
+            "\n[GEMINI PROMPT STREAM] Evidence schemes: %d" +
+            "\n[GEMINI PROMPT STREAM] prompt preview (first 800 chars):\n%s" +
+            "\n" + "-"*70,
+            self.model_name,
+            target_lang,
+            evidence_context.total_schemes if evidence_context else 0,
+            prompt_preview,
+        )
+
         # 3. Stream from Gemini Generation API
         try:
             from google.genai import types
@@ -288,9 +353,33 @@ class RAGGenerator:
                     temperature=0.0,
                 ),
             )
+            
+            # Buffer small amount of text across tokens to prevent leaking partial [S... tags
+            stream_buf = ""
             for chunk in response_stream:
                 if chunk and chunk.text:
-                    yield chunk.text
+                    stream_buf += chunk.text
+
+                    # If there's an open '[' without a matching ']' in the buffer, hold onto it
+                    open_bracket_idx = stream_buf.rfind("[")
+                    close_bracket_idx = stream_buf.rfind("]")
+
+                    if open_bracket_idx != -1 and (close_bracket_idx == -1 or open_bracket_idx > close_bracket_idx):
+                        # Potential unclosed tag: yield safe text before '['
+                        safe_text = stream_buf[:open_bracket_idx]
+                        stream_buf = stream_buf[open_bracket_idx:]
+                    else:
+                        safe_text = stream_buf
+                        stream_buf = ""
+
+                    cleaned_text = strip_technical_citations(safe_text)
+                    if cleaned_text:
+                        yield cleaned_text
+
+            if stream_buf:
+                cleaned_final = strip_technical_citations(stream_buf)
+                if cleaned_final:
+                    yield cleaned_final
 
         except Exception as e:
             err_str = str(e).lower()

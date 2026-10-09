@@ -73,9 +73,155 @@ from src.retrieval.scheme_reranker import (
     SchemeReranker,
     rerank_schemes,
 )
+from src.retrieval.scheme_resolver import get_scheme_resolver, SchemeResolver
+
+# Fuzzy matching for typo correction (optional — degrades gracefully if not installed)
+try:
+    from rapidfuzz import process as rfprocess, fuzz as rffuzz
+    _RAPIDFUZZ_AVAILABLE = True
+except ImportError:
+    _RAPIDFUZZ_AVAILABLE = False
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
+
+ACRONYM_MAP: Dict[str, str] = {
+    # PM-KISAN variants
+    "pm kisan": "Pradhan Mantri Kisan Samman Nidhi",
+    "pm-kisan": "Pradhan Mantri Kisan Samman Nidhi",
+    "pmkisan": "Pradhan Mantri Kisan Samman Nidhi",
+    "kisan samman": "Pradhan Mantri Kisan Samman Nidhi",
+    "kisan nidhi": "Pradhan Mantri Kisan Samman Nidhi",
+    # PM Awas
+    "pm awas": "Pradhan Mantri Awas Yojana",
+    "pmay": "Pradhan Mantri Awas Yojana",
+    "pm-awas": "Pradhan Mantri Awas Yojana",
+    "awas yojana": "Pradhan Mantri Awas Yojana",
+    # Ayushman Bharat / PM-JAY
+    "ayushman bharat": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana",
+    "pmjay": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana",
+    "pm-jay": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana",
+    "pm jay": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana",
+    "jan arogya": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana",
+    # Insurance / Pension
+    "pmjjby": "Pradhan Mantri Jeevan Jyoti Bima Yojana",
+    "pmsby": "Pradhan Mantri Suraksha Bima Yojana",
+    "apy": "Atal Pension Yojana",
+    "atal pension": "Atal Pension Yojana",
+    # Ujjwala
+    "pmuy": "Pradhan Mantri Ujjwala Yojana",
+    "ujjwala": "Pradhan Mantri Ujjwala Yojana",
+    "pm ujjwala": "Pradhan Mantri Ujjwala Yojana",
+    # Employment / MSME
+    "pmegp": "Prime Minister Employment Generation Programme",
+    "mudra": "Pradhan Mantri MUDRA Yojana",
+    "pm mudra": "Pradhan Mantri MUDRA Yojana",
+    "startup india": "Startup India Scheme",
+    "standup india": "Stand Up India Scheme",
+    # Credit / Farm
+    "kcc": "Kisan Credit Card",
+    "kisan credit": "Kisan Credit Card",
+    # Education
+    "pm vidya": "PM eVIDYA",
+    "sukanya": "Sukanya Samriddhi Yojana",
+    # Swachh
+    "swachh bharat": "Swachh Bharat Mission",
+    "sbm": "Swachh Bharat Mission",
+    # Digital India
+    "digital india": "Digital India Programme",
+    # Fasal Bima
+    "pmfby": "Pradhan Mantri Fasal Bima Yojana",
+    "fasal bima": "Pradhan Mantri Fasal Bima Yojana",
+    # Jan Dhan
+    "jan dhan": "Pradhan Mantri Jan Dhan Yojana",
+    "pmjdy": "Pradhan Mantri Jan Dhan Yojana",
+    # Gramin / Rural
+    "mgnrega": "Mahatma Gandhi National Rural Employment Guarantee Act",
+    "nrega": "Mahatma Gandhi National Rural Employment Guarantee Act",
+    "mnrega": "Mahatma Gandhi National Rural Employment Guarantee Act",
+}
+
+# Vocabulary for fuzzy typo correction — known correct spellings for common scheme-related words.
+# Words from ACRONYM_MAP + a curated list of frequently mistyped scheme/govt terms.
+_EXTRA_SCHEME_WORDS: List[str] = [
+    # Scheme name words users often mistype
+    "kisan", "pradhan", "mantri", "samman", "nidhi", "yojana", "bharat", "ayushman",
+    "arogya", "jeevan", "jyoti", "bima", "suraksha", "pension", "ujjwala", "awas",
+    "scholarship", "education", "farmer", "health", "pension", "insurance", "credit",
+    "employment", "generation", "programme", "housing", "sanitation", "digital",
+    "mahila", "balika", "kanya", "kishori", "vikas", "grameen", "rural", "urban",
+    "swachh", "rashtriya", "national", "central", "state", "subsidy", "scheme",
+    "welfare", "social", "financial", "assistance", "support", "benefit", "income",
+    "certificate", "ration", "card", "passport", "disability", "widows", "elderly",
+    "minority", "backward", "tribal", "fishermen", "artisan", "weaver", "skill",
+    "training", "startup", "enterprise", "mudra", "standup", "startup", "msme",
+]
+_FUZZY_VOCAB: List[str] = sorted(set(
+    [
+        word
+        for phrase in list(ACRONYM_MAP.keys()) + list(ACRONYM_MAP.values())
+        for word in phrase.lower().split()
+        if len(word) >= 4
+    ] + [w for w in _EXTRA_SCHEME_WORDS if len(w) >= 4]
+))
+
+
+def _fuzzy_correct_query(query: str, threshold: int = 82) -> str:
+    """
+    Corrects common typos in the user query by fuzzy-matching each token
+    against a vocabulary of known scheme-related terms.
+
+    Examples:
+      "pm kishan" -> "pm kisan"
+      "ayushman bahart" -> "ayushman bharat"
+      "pradhan mantry" -> "pradhan mantri"
+
+    Args:
+        query: Raw user query string.
+        threshold: Minimum similarity score (0-100) to apply a correction. Default 82.
+
+    Returns:
+        Corrected query string (or original if no corrections needed or rapidfuzz not available).
+    """
+    if not _RAPIDFUZZ_AVAILABLE or not _FUZZY_VOCAB:
+        return query
+
+    tokens = query.split()
+    corrected_tokens = []
+    changed = False
+
+    for token in tokens:
+        # Skip short tokens, numbers, and non-latin scripts (Hindi/Gujarati)
+        if len(token) < 4 or not token.isascii():
+            corrected_tokens.append(token)
+            continue
+
+        lower_tok = token.lower()
+        # Already an exact match — no correction needed
+        if lower_tok in _FUZZY_VOCAB:
+            corrected_tokens.append(token)
+            continue
+
+        result = rfprocess.extractOne(
+            lower_tok,
+            _FUZZY_VOCAB,
+            scorer=rffuzz.WRatio,
+            score_cutoff=threshold,
+        )
+        if result:
+            best_match, score, _ = result
+            # Preserve original casing style
+            corrected = best_match if token.islower() else best_match.capitalize()
+            corrected_tokens.append(corrected)
+            changed = True
+            import logging as _log
+            _log.getLogger("sugamgov_api").debug(
+                "[TYPO FIX] '%s' -> '%s' (score=%d)", token, corrected, score
+            )
+        else:
+            corrected_tokens.append(token)
+
+    return " ".join(corrected_tokens) if changed else query
 
 
 @dataclass
@@ -169,6 +315,7 @@ class RetrievalService:
             default_candidate_k=self.default_candidate_k,
         )
         self.scheme_reranker = scheme_reranker or SchemeReranker(field_priority=field_priority)
+        self.scheme_resolver = get_scheme_resolver(self.engine)
 
         # Internal cache for dynamic coverage metrics
         self._coverage_info: Optional[Dict[str, Any]] = None
@@ -249,7 +396,6 @@ class RetrievalService:
         }
 
         # IMPORTANT: Short-circuit blank or whitespace-only queries immediately
-        # Avoids making unnecessary Gemini API embedding calls and conserving quota.
         if not clean_query:
             return RetrievalResponse(
                 query=clean_query,
@@ -271,10 +417,43 @@ class RetrievalService:
         # Ensure candidate pool is large enough to satisfy requested top_k after consolidation
         effective_candidate_k = max(base_candidate_k, top_k * 2)
 
-        # 3. Candidate Retrieval via HybridRetriever
+        # 3. Dynamic Scheme Resolution (handles acronyms, typos, and short names across all 5,954 schemes)
+        resolved_chunks: List[RetrievalResult] = []
+        hybrid_search_query = clean_query
+
+        try:
+            scheme_matches = self.scheme_resolver.resolve(
+                query=clean_query,
+                state=clean_state,
+                top_k=top_k,
+                min_confidence=75.0,
+            )
+            if scheme_matches:
+                top_match = scheme_matches[0]
+                import logging as _log
+                _log.getLogger("sugamgov_api").info(
+                    "[SCHEME RESOLVED] Query '%s' -> '%s' (ID=%s, score=%.1f, type=%s)",
+                    clean_query, top_match.scheme_name, top_match.scheme_id, top_match.score, top_match.match_type
+                )
+                # Fetch authoritative chunks for all confident matches
+                for sm in scheme_matches:
+                    s_chunks = self.scheme_resolver.get_chunks_for_scheme(
+                        scheme_id=sm.scheme_id,
+                        query=clean_query,
+                        limit=6,
+                    )
+                    resolved_chunks.extend(s_chunks)
+
+                # Rewrite hybrid query to canonical scheme name for optimal FTS / vector search
+                hybrid_search_query = top_match.scheme_name
+        except Exception as e:
+            import logging as _log
+            _log.getLogger("sugamgov_api").warning("SchemeResolver error: %s", e)
+
+        # 4. Candidate Retrieval via HybridRetriever
         try:
             candidate_chunks = self.hybrid_retriever.retrieve(
-                query=clean_query,
+                query=hybrid_search_query,
                 state=clean_state,
                 level=clean_level,
                 category=clean_category,
@@ -292,7 +471,7 @@ class RetrievalService:
             # If Gemini API quota (429) or embedding generation failed, gracefully degrade to keyword retrieval
             if any(term in err_str for term in ["quota", "429", "resource_exhausted", "embed", "clienterror"]):
                 candidate_chunks = self.hybrid_retriever.keyword_retriever.retrieve(
-                    query=clean_query,
+                    query=hybrid_search_query,
                     state=clean_state,
                     level=clean_level,
                     category=clean_category,
@@ -302,7 +481,15 @@ class RetrievalService:
                 # Re-raise unexpected internal errors
                 raise
 
-        # 4. Scheme-Level Consolidation and Deterministic Reranking
+        # 5. Prioritize Authoritative Resolved Chunks at the front of candidate set
+        if resolved_chunks:
+            existing_chunk_ids = {c.chunk_id for c in resolved_chunks}
+            for c in candidate_chunks:
+                if c.chunk_id not in existing_chunk_ids:
+                    resolved_chunks.append(c)
+            candidate_chunks = resolved_chunks
+
+        # 6. Scheme-Level Consolidation and Deterministic Reranking
         scheme_results = self.scheme_reranker.rerank(
             results=candidate_chunks,
             top_k=top_k,

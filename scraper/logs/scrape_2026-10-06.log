@@ -1,0 +1,63 @@
+22:24:46 [INFO    ] sugamgov_scraper.daily: 
+======================================================================
+  SugamGov Daily Scheme Scraper — 2026-10-06
+======================================================================
+22:24:47 [INFO    ] sugamgov_scraper.daily: Connected to PostgreSQL database
+22:24:47 [INFO    ] sugamgov_scraper.myscheme: Starting myscheme.gov.in API scrape (max 2 pages × 20 per page)
+22:24:47 [WARNING ] sugamgov_scraper.myscheme: Page 1 returned HTTP 401 (attempt 1)
+22:24:49 [WARNING ] sugamgov_scraper.myscheme: Page 1 returned HTTP 401 (attempt 2)
+22:24:51 [WARNING ] sugamgov_scraper.myscheme: Page 1 returned HTTP 401 (attempt 3)
+22:24:53 [ERROR   ] sugamgov_scraper.myscheme: Failed to fetch page 1 after 3 attempts
+22:24:53 [INFO    ] sugamgov_scraper.myscheme: Page 1 returned None — stopping pagination
+22:24:53 [INFO    ] sugamgov_scraper.myscheme: myscheme.gov.in scrape complete: 0 schemes fetched
+22:24:53 [INFO    ] sugamgov_scraper.myscheme_api: myscheme_api: fetched 0 schemes, 0 valid after validation
+22:24:53 [INFO    ] sugamgov_scraper.daily: myscheme.gov.in: 0 valid schemes fetched
+22:24:53 [WARNING ] sugamgov_scraper.daily: No schemes scraped from any source — nothing to do
+22:28:20 [INFO    ] sugamgov_scraper.daily: 
+======================================================================
+  SugamGov Daily Scheme Scraper — 2026-10-06
+======================================================================
+22:28:20 [INFO    ] sugamgov_scraper.daily: Connected to PostgreSQL database
+22:28:20 [ERROR   ] sugamgov_scraper.daily: myscheme scraper failed: MySchemeScraper.__init__() got an unexpected keyword argument 'max_pages'
+Traceback (most recent call last):
+  File "C:\Users\MAHIR\OneDrive\Desktop\Projects\sugamAI_EP-project\sugamgov-rag\scraper\run_daily.py", line 106, in run
+    scraper = MySchemeScraper(max_pages=args.max_pages)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: MySchemeScraper.__init__() got an unexpected keyword argument 'max_pages'
+22:28:20 [WARNING ] sugamgov_scraper.daily: No schemes scraped from any source — nothing to do
+22:28:41 [INFO    ] sugamgov_scraper.daily: 
+======================================================================
+  SugamGov Daily Scheme Scraper — 2026-10-06
+======================================================================
+22:28:41 [INFO    ] sugamgov_scraper.daily: Connected to PostgreSQL database
+22:28:41 [INFO    ] sugamgov_scraper.myscheme: Fetching scheme list from sitemap: https://www.myscheme.gov.in/sitemap.xml
+22:28:42 [INFO    ] sugamgov_scraper.myscheme: Found 0 scheme URLs in sitemap
+22:28:42 [WARNING ] sugamgov_scraper.myscheme: No scheme URLs found from sitemap
+22:28:42 [INFO    ] sugamgov_scraper.myscheme_web: myscheme_web: fetched 0 schemes, 0 valid after validation
+22:28:42 [INFO    ] sugamgov_scraper.daily: myscheme.gov.in: 0 valid schemes fetched
+22:28:42 [WARNING ] sugamgov_scraper.daily: No schemes scraped from any source — nothing to do
+22:30:29 [INFO    ] sugamgov_scraper.daily: 
+======================================================================
+  SugamGov Daily Scheme Scraper — 2026-10-06
+======================================================================
+22:30:29 [INFO    ] sugamgov_scraper.daily: Connected to PostgreSQL database
+22:30:30 [INFO    ] sugamgov_scraper.myscheme: Fetching scheme list from sitemap: https://www.myscheme.gov.in/sitemap.xml
+22:30:30 [INFO    ] sugamgov_scraper.myscheme: Fetching nested sitemap: https://www.myscheme.gov.in/sitemap-0.xml
+22:30:30 [INFO    ] sugamgov_scraper.myscheme: Found 0 scheme URLs in sitemaps
+22:30:30 [WARNING ] sugamgov_scraper.myscheme: No scheme URLs found from sitemap
+22:30:30 [INFO    ] sugamgov_scraper.myscheme_web: myscheme_web: fetched 0 schemes, 0 valid after validation
+22:30:30 [INFO    ] sugamgov_scraper.daily: myscheme.gov.in: 0 valid schemes fetched
+22:30:30 [WARNING ] sugamgov_scraper.daily: No schemes scraped from any source — nothing to do
+22:33:58 [INFO    ] sugamgov_scraper.daily: 
+======================================================================
+  SugamGov Daily Scheme Scraper — 2026-10-06
+======================================================================
+22:33:58 [INFO    ] sugamgov_scraper.daily: Connected to PostgreSQL database
+22:33:59 [INFO    ] sugamgov_scraper.pmindia: Starting pmindia.gov.in scrape from https://www.pmindia.gov.in/en/government_tr_rec/schemes/
+22:33:59 [WARNING ] sugamgov_scraper.pmindia: HTTP 403 for https://www.pmindia.gov.in/en/government_tr_rec/schemes/ (attempt 1)
+22:34:01 [WARNING ] sugamgov_scraper.pmindia: HTTP 403 for https://www.pmindia.gov.in/en/government_tr_rec/schemes/ (attempt 2)
+22:34:03 [WARNING ] sugamgov_scraper.pmindia: HTTP 403 for https://www.pmindia.gov.in/en/government_tr_rec/schemes/ (attempt 3)
+22:34:05 [ERROR   ] sugamgov_scraper.pmindia: Failed to fetch pmindia.gov.in listing page
+22:34:05 [INFO    ] sugamgov_scraper.pmindia_gov: pmindia_gov: fetched 0 schemes, 0 valid after validation
+22:34:05 [INFO    ] sugamgov_scraper.daily: pmindia.gov.in: 0 valid schemes fetched
+22:34:05 [WARNING ] sugamgov_scraper.daily: No schemes scraped from any source — nothing to do
