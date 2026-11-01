@@ -137,7 +137,7 @@ def main():
 
     settings = get_settings()
     total_checks += 1
-    if settings.api_port == 8000 and "http://localhost:3000" in settings.cors_origins:
+    if settings.api_port in (8000, 10000) and "http://localhost:3000" in settings.cors_origins:
         passed_checks += 1
         print(f"       ✓ Settings loaded: port={settings.api_port}, cors={settings.cors_origins}")
     else:

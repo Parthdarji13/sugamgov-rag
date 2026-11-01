@@ -197,8 +197,10 @@ class ChatService:
         if request.session_id:
             session = self.session_store.get_session(request.session_id)
             if not session:
-                # Automatically restore/create session with requested ID instead of failing
-                session = self.session_store.create_session(session_id=request.session_id)
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Session '{request.session_id}' not found. Please omit session_id to start a new chat session.",
+                )
         else:
             session = self.session_store.create_session()
 

@@ -63,16 +63,21 @@ logger = logging.getLogger("sugamgov_api")
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan context for startup and shutdown resource handling."""
     logger.info("SugamGov AI RAG API starting up...")
-    try:
-        from src.retrieval.vector_retriever import get_embedding_model
-        logger.info("Pre-warming local multilingual embedding model (intfloat/multilingual-e5-small)...")
-        get_embedding_model()
-        from src.retrieval.scheme_resolver import get_scheme_resolver
-        logger.info("Pre-warming SchemeResolver catalog...")
-        get_scheme_resolver()
-        logger.info("SchemeResolver catalog pre-warmed and ready.")
-    except Exception as e:
-        logger.warning("Could not pre-warm models/catalog at startup: %s", e)
+    import os
+    should_prewarm = os.getenv("PREWARM_MODELS", "true").lower() in ("true", "1", "yes")
+    if should_prewarm:
+        try:
+            from src.retrieval.vector_retriever import get_embedding_model
+            logger.info("Pre-warming local multilingual embedding model (ONNX Runtime INT8)...")
+            get_embedding_model()
+            from src.retrieval.scheme_resolver import get_scheme_resolver
+            logger.info("Pre-warming SchemeResolver catalog...")
+            get_scheme_resolver()
+            logger.info("SchemeResolver catalog pre-warmed and ready.")
+        except Exception as e:
+            logger.warning("Could not pre-warm models/catalog at startup: %s", e)
+    else:
+        logger.info("Prewarming skipped (PREWARM_MODELS=false). Models will load lazily on first query.")
     yield
     logger.info("SugamGov AI RAG API shutting down...")
     reset_dependencies()
